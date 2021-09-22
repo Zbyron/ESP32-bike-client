@@ -5,7 +5,8 @@ import Activity from './containers/Activity/Activity'
 import Results from './containers/Results/Results'
 import Intro from './containers/Intro/Intro'
 import Records from './containers/Records/Records'
-
+import store from './app/store'
+import { Provider } from 'react-redux'
 import reportWebVitals from './reportWebVitals'
 import { BrowserRouter, Route } from "react-router-dom"
 // import * as serviceWorker from './serviceWorker';
@@ -14,15 +15,17 @@ import { BrowserRouter, Route } from "react-router-dom"
 
 ReactDOM.render(
   <React.StrictMode>
-    <BrowserRouter>
-        <div className="App">
-          <Route path="/" exact component={Intro} />
-          <Route path="/Intro" exact component={Intro} />
-          <Route path="/Activity" exact component={Activity} />
-          <Route path="/Results" exact component={Results} />
-          <Route path="/Records" exact component={Records} />
-        </div>
-      </BrowserRouter>
+    <Provider store={store}>
+      <BrowserRouter>
+          <div className="App">
+            <Route path="/" exact component={Intro} />
+            <Route path="/Intro" exact component={Intro} />
+            <Route path="/Activity" exact component={Activity} />
+            <Route path="/Results" exact component={Results} />
+            <Route path="/Records" exact component={Records} />
+          </div>
+        </BrowserRouter>
+      </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );

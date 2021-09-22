@@ -2,9 +2,16 @@ const { app, BrowserWindow, ipcMain } = require('electron')
 const isDev = require('electron-is-dev');   
 const path = require('path');
 const Store = require('electron-store');
+const { channels } = require('../src/constants/storeChannels')
 
 const schema = {
-  launchAtStart: true
+  launchAtStart: true,
+  currentSession: {
+    startDate: 0,
+    peds: 0,
+    meters: 0,
+    endDate: 0
+  }
 }
 const store = new Store(schema);
 let mainWindow;
@@ -39,6 +46,11 @@ function createWindow () {
     app.on('activate', function () {
       if (BrowserWindow.getAllWindows().length === 0) createWindow()
     })
+
+    //last results
+    mainWindow.webContents.on('did-finish-load', () => {
+        mainWindow.webContents.send(channels.LAST_RESULT, store.get(channels.RESULTS));
+    });
   })
 
   app.on('window-all-closed', function () {
@@ -46,24 +58,22 @@ function createWindow () {
   })
 
 ipcMain.on('asynchronous-message', (event, arg) => {
-    console.log('heyyyy', arg); // prints "heyyyy ping"
-
     //Save them to the store
     store.set('test', arg);
 
     console.log('store', store.get('test'));
 });
-
-ipcMain.on('results', (event, arg) => {
+``
+ipcMain.on(channels.RESULTS, (event, arg) => {
     //Save them to the store
-    store.set('results', arg);
+    store.set(channels.RESULTS, arg);
 
-    console.log('store', store.get('results'));
+    console.log('store', store.get(channels.RESULTS));
 });
 
-ipcMain.on('activity-params', (event, arg) => {
+ipcMain.on(channels.ACTIVITY_PARAMS, (event, arg) => {
     //Save them to the store
-    store.set('params', arg);
+    store.set(channels.ACTIVITY_PARAMS, arg);
 
-    console.log('store', store.get('params'));
+    console.log('store', store.get(channels.ACTIVITY_PARAMS));
 });
