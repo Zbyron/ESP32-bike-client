@@ -2,9 +2,24 @@ const { app, BrowserWindow, ipcMain } = require('electron')
 const isDev = require('electron-is-dev');   
 const path = require('path');
 const Store = require('electron-store');
+const { channels } = require('../src/constants/storeChannels')
+const sqlite3 = require('sqlite3');
+
+const database = new sqlite3.Database('./public/db.sqlite3', (err) => {
+    if (err) console.error('Database opening error: ', err);
+});
 
 const schema = {
-  launchAtStart: true
+  launchAtStart: true,
+  currentSession: {
+    startDate: 0,
+      peds: 0,
+      meters: 0,
+      endDate:0,
+      score:0 ,
+      avgSpeed: 0,
+      version: 0
+  }
 }
 const store = new Store(schema);
 let mainWindow;
@@ -39,31 +54,41 @@ function createWindow () {
     app.on('activate', function () {
       if (BrowserWindow.getAllWindows().length === 0) createWindow()
     })
+
+    //last results
+    mainWindow.webContents.on('did-finish-load', () => {
+        mainWindow.webContents.send(channels.LAST_SESSION, store.get(channels.LAST_SESSION));
+    });
   })
 
   app.on('window-all-closed', function () {
     if (process.platform !== 'darwin') app.quit()
   })
 
-ipcMain.on('asynchronous-message', (event, arg) => {
-    console.log('heyyyy', arg); // prints "heyyyy ping"
+// SESSIONS
+ipcMain.on(channels.SESSIONS, (event, arg) => {
+    const sql =  'SELECT * FROM SESSION ORDER BY ID DESC;'
 
-    //Save them to the store
-    store.set('test', arg);
-
-    console.log('store', store.get('test'));
+    database.all(sql, (err, rows) => {
+        event.reply(channels.SESSIONS, (err && err.message) || rows);
+    });
 });
 
-ipcMain.on('results', (event, arg) => {
-    //Save them to the store
-    store.set('results', arg);
-
-    console.log('store', store.get('results'));
+//LAST_RESULT
+ipcMain.on(channels.LAST_SESSION, (event, arg) => {
+        event.reply(channels.LAST_SESSION, store.get(channels.LAST_SESSION));
 });
 
-ipcMain.on('activity-params', (event, arg) => {
-    //Save them to the store
-    store.set('params', arg);
+//ADD_SESSION
+ipcMain.on(channels.ADD_SESSION, (event, { startDate, peds, meters, endDate, score, avgSpeed, version}) => {
+    const lastSession = { startDate, peds, meters, endDate, score, avgSpeed, version}
+    store.set(channels.LAST_SESSION, lastSession) 
+    
+    const sql = `INSERT INTO SESSION (START_DATE, END_DATE, PEDS, METERS, SCORE, VERSION, AVG_SPEED) VALUES( "${startDate}" ,"${endDate}", ${peds}, ${meters}, ${score}, ${version}, ${avgSpeed});`
+    database.run(sql, (err) => {
+        event.reply(channels.ADD_SESSION, (err && err.message));
+    });
 
-    console.log('store', store.get('params'));
 });
+
+
