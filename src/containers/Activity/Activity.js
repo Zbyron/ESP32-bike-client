@@ -88,15 +88,12 @@ function Activity () {
 
     useEffect(() => {
         setScore(calculateScore(peds,duration, maxKMPH))
-
-        let socket = io('http://localhost:8888');
-        socket.on('serialdata', (data) => {
-            console.log('bike data', data)
+        const removeEventListener = window.api.receive(channels.COM_EVENT,(result) => {
             updateBikeData()
-        });
+         })
 
-        return function cleanup() {
-            socket.close();
+         return () => {
+            removeEventListener();
         };
       });
   
