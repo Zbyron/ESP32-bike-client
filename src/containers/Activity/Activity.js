@@ -1,39 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useHistory } from "react-router-dom";
 import { useDispatch } from 'react-redux'
-import io from 'socket.io-client';
 import { latest } from '../../features/session/sessionSlice'
 import useInterval from '../../hooks/useInterval'
 import { channels } from '../../constants/storeChannels'
-
-const pedMeters = 5.3
-
-function calculateDuration(startDate) {
-    const startDateObj = new Date(startDate)
-    const currentTime = new Date()
-
-    return Math.round((currentTime - startDateObj) /1000)
-}
-
-function calculateScore(meters,duration, maxKMPH){
-    let score = 0
-    const meterPoints = meters * 25.5
-    const durationPoints = duration * 10
-    const maxKMPHPoints = maxKMPH * 200
-
-    score = Math.round(meterPoints + durationPoints + maxKMPHPoints)
-    
-    return score
-}
-
-function calculateFinalScore(score, avgSpeed){
-    const avgSpeeedPoints = avgSpeed * 100
-    return Math.round(score + avgSpeeedPoints)
-
-}
-function getMeters(peds) {
-    return peds * pedMeters
-}
+import { currentScreen } from '../../features/appData/appDataSlice'
+import { calculateDuration, calculateScore, calculateFinalScore, getMeters, formatTime } from '../../utils/utils'
+import  { version, pedMeters } from '../../constants/constants'
 
 function Activity () {
     const history = useHistory()
@@ -47,7 +20,6 @@ function Activity () {
     const [duration, setDuration] = useState(0)
     const [score, setScore] = useState(0)
 
-    const version = 0
 
     const updateBikeData = useCallback( () => {
         setPeds(peds + 1)
@@ -55,7 +27,7 @@ function Activity () {
       })
     
     const endSession = useCallback(() => {
-        const avgSpeed = ((getMeters(peds) /1000) / duration) 
+        const avgSpeed = ((getMeters(peds)) / duration) 
         const finalScore = (calculateFinalScore(score, avgSpeed))
         const sessionData = {
             startDate,
@@ -87,6 +59,8 @@ function Activity () {
     }, 1000);
 
     useEffect(() => {
+        dispatch(currentScreen('Activity'))
+
         setScore(calculateScore(peds,duration, maxKMPH))
         const removeEventListener = window.api.receive(channels.COM_EVENT,(result) => {
             updateBikeData()
@@ -105,7 +79,7 @@ function Activity () {
             <h3> Interval {intervalCount}</h3>
             <h3> KMPH {KMPH}</h3>
             <h3> Score {score}</h3>
-            <h3> Duration {duration}</h3>
+            <h3> Duration {formatTime(duration)}</h3>
 
             <button onClick={endSession}>End Session</button>
         </div>
