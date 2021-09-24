@@ -7,9 +7,13 @@ function Records() {
 
     useEffect(() => {
         window.api.send(channels.SESSIONS,{})
-        window.api.receive(channels.SESSIONS,(result) => {
+        const removeEventListener = window.api.receive(channels.SESSIONS,(result) => {
            setDbSession(result)
         })
+
+        return () => {
+            removeEventListener();
+        };
    },[])
 
     return (

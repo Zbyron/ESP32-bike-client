@@ -92,3 +92,13 @@ ipcMain.on(channels.ADD_SESSION, (event, { startDate, peds, meters, endDate, sco
 });
 
 
+const SerialPort = require('serialport');
+const Readline = SerialPort.parsers.Readline; 
+const usbport = new SerialPort("COM7", {
+    baudRate: 9600
+})
+const parser = usbport.pipe(new Readline()); 
+parser.on('data', function (data) {
+    console.log('data ',data)
+    mainWindow.webContents.send(channels.COM_EVENT, data);
+});

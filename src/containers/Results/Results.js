@@ -10,9 +10,13 @@ function Results() {
     useEffect(() => {
         window.api.send(channels.LAST_SESSION,{})
 
-        window.api.receive(channels.LAST_SESSION,(stateSession) => {
+        const removeEventListener = window.api.receive(channels.LAST_SESSION,(stateSession) => {
             setStateSession(stateSession)
         })
+
+        return () => {
+            removeEventListener();
+        };
    },[])
 
     return (

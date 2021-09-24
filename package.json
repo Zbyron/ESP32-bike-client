@@ -23,7 +23,7 @@
     "react-redux": "^7.2.5",
     "react-router-dom": "^5.3.0",
     "react-scripts": "4.0.3",
-    "serialport": "^9.2.1",
+    "serialport": "^9.2.3",
     "socket.io": "^4.2.0",
     "socket.io-client": "^4.2.0",
     "sqlite3": "^5.0.2",
@@ -57,5 +57,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "electron-rebuild": "^3.2.3"
   }
 }
