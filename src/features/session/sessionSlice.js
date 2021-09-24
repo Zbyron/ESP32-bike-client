@@ -4,10 +4,13 @@ export const sessionSlice = createSlice({
   name: 'session',
   initialState: { 
     session: {
-    startDate: 0,
-    peds: 0,
-    meters:0,
-    endDate: 0
+      startDate: 0,
+      peds: 0,
+      meters: 0,
+      endDate:0,
+      score:0 ,
+      avgSpeed: 0,
+      version: 0
   }
 },
   reducers: {

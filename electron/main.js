@@ -9,14 +9,16 @@ const database = new sqlite3.Database('./public/db.sqlite3', (err) => {
     if (err) console.error('Database opening error: ', err);
 });
 
-
 const schema = {
   launchAtStart: true,
   currentSession: {
     startDate: 0,
-    peds: 0,
-    meters: 0,
-    endDate: 0
+      peds: 0,
+      meters: 0,
+      endDate:0,
+      score:0 ,
+      avgSpeed: 0,
+      version: 0
   }
 }
 const store = new Store(schema);
@@ -55,7 +57,7 @@ function createWindow () {
 
     //last results
     mainWindow.webContents.on('did-finish-load', () => {
-        mainWindow.webContents.send(channels.LAST_RESULT, store.get(channels.RESULTS));
+        mainWindow.webContents.send(channels.LAST_SESSION, store.get(channels.LAST_SESSION));
     });
   })
 
@@ -63,20 +65,26 @@ function createWindow () {
     if (process.platform !== 'darwin') app.quit()
   })
 
-ipcMain.on(channels.RESULTS, (event, arg) => {
-    //Save them to the store
-    const sql = arg;
+// SESSIONS
+ipcMain.on(channels.SESSIONS, (event, arg) => {
+    const sql =  'SELECT * FROM SESSION ORDER BY ID DESC;'
 
     database.all(sql, (err, rows) => {
-        event.reply(channels.RESULTS, (err && err.message) || rows);
+        event.reply(channels.SESSIONS, (err && err.message) || rows);
     });
-
 });
 
-ipcMain.on(channels.ADD_SESSION, (event, arg) => {
-    //Save them to the store
-    const sql = arg;
+//LAST_RESULT
+ipcMain.on(channels.LAST_SESSION, (event, arg) => {
+        event.reply(channels.LAST_SESSION, store.get(channels.LAST_SESSION));
+});
 
+//ADD_SESSION
+ipcMain.on(channels.ADD_SESSION, (event, { startDate, peds, meters, endDate, score, avgSpeed, version}) => {
+    const lastSession = { startDate, peds, meters, endDate, score, avgSpeed, version}
+    store.set(channels.LAST_SESSION, lastSession) 
+    
+    const sql = `INSERT INTO SESSION (START_DATE, END_DATE, PEDS, METERS, SCORE, VERSION, AVG_SPEED) VALUES( "${startDate}" ,"${endDate}", ${peds}, ${meters}, ${score}, ${version}, ${avgSpeed});`
     database.run(sql, (err) => {
         event.reply(channels.ADD_SESSION, (err && err.message));
     });
