@@ -9,11 +9,11 @@ const availableChannels = Object.values(channels)
 // the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld(
     "api", {
-        send: (channel, data) => {
+        send:  (channel, data) => {
             // whitelist channels
             // let validChannels = ["asynchronous-message",'results', 'activity-params'];
             if (availableChannels.includes(channel)) {
-                ipcRenderer.send(channel, data);
+                return ipcRenderer.send(channel, data);
             }
         },
         receive: (channel, func) => {
@@ -23,7 +23,7 @@ contextBridge.exposeInMainWorld(
                 const newFunc = (_, data) => func(data);
                 ipcRenderer.on(channel,newFunc);
                 return () => {
-                    ipcRenderer.removeListener(channel, newFunc);
+                    return ipcRenderer.removeListener(channel, newFunc);
                 };
             }
         },

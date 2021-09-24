@@ -3,6 +3,12 @@ const isDev = require('electron-is-dev');
 const path = require('path');
 const Store = require('electron-store');
 const { channels } = require('../src/constants/storeChannels')
+const sqlite3 = require('sqlite3');
+
+const database = new sqlite3.Database('./public/db.sqlite3', (err) => {
+    if (err) console.error('Database opening error: ', err);
+});
+
 
 const schema = {
   launchAtStart: true,
@@ -57,23 +63,24 @@ function createWindow () {
     if (process.platform !== 'darwin') app.quit()
   })
 
-ipcMain.on('asynchronous-message', (event, arg) => {
-    //Save them to the store
-    store.set('test', arg);
-
-    console.log('store', store.get('test'));
-});
-``
 ipcMain.on(channels.RESULTS, (event, arg) => {
     //Save them to the store
-    store.set(channels.RESULTS, arg);
+    const sql = arg;
 
-    console.log('store', store.get(channels.RESULTS));
+    database.all(sql, (err, rows) => {
+        event.reply(channels.RESULTS, (err && err.message) || rows);
+    });
+
 });
 
-ipcMain.on(channels.ACTIVITY_PARAMS, (event, arg) => {
+ipcMain.on(channels.ADD_SESSION, (event, arg) => {
     //Save them to the store
-    store.set(channels.ACTIVITY_PARAMS, arg);
+    const sql = arg;
 
-    console.log('store', store.get(channels.ACTIVITY_PARAMS));
+    database.run(sql, (err) => {
+        event.reply(channels.ADD_SESSION, (err && err.message));
+    });
+
 });
+
+

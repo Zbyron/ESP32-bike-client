@@ -4,32 +4,40 @@ import { useDispatch } from 'react-redux'
 import io from 'socket.io-client';
 import { latest } from '../../features/session/sessionSlice'
 import useInterval from '../../hooks/useInterval'
-
+import { channels } from '../../constants/storeChannels'
 function Activity () {
     const history = useHistory()
     const dispatch = useDispatch()
     const pedMeters = 5.3
-    const [startDate, setStartDate] = useState(new Date())
+    const [startDate, setStartDate] = useState(new Date().toJSON())
     const [peds, setPeds] = useState(0)
     const [intervalCount, seIntervalCount] = useState(0)
     const [pedInverval, setPedInterval] = useState(0)
     const [KMPH, setKMPH] = useState(0)
-
+    const version = 0
     const updateBikeData = useCallback( () => {
         setPeds(peds +1)
         setPedInterval(pedInverval +1)
       })
     
     const endSession = useCallback(() => {
+        const avgSpeed = 0 //calculate this
+        const score = 0
+        // // save to db
+        // const sql = 'SELECT * FROM SESSION'
+        // window.api.send(channels.LAST_RESULT,sql)
         const sessionData = {
-            startDate: startDate.toJSON(),
+            startDate: startDate,
             peds,
             meters: peds * pedMeters,
-            endDate: new Date().toJSON()
+            endDate: new Date().toJSON(),
+            score: score
         }
         
         dispatch(latest(sessionData))
 
+        const sql = `INSERT INTO SESSION (START_DATE, END_DATE, PEDS, METERS, SCORE, VERSION) VALUES( "${startDate}" ,"${sessionData.endDate}", ${peds}, ${sessionData.meters}, ${score}, ${version});`
+        window.api.send(channels.ADD_SESSION,sql)
         history.push("/Results");
     
     })
