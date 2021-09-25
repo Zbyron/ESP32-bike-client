@@ -1,11 +1,12 @@
+import React from 'react'
 import { Link } from "react-router-dom";
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { channels } from '../../constants/storeChannels'
 import { useState, useEffect } from "react";
 import { currentScreen } from '../../features/appData/appDataSlice'
 import "bulma/css/bulma.css";
 import "bulma-helpers/css/bulma-helpers.min.css";
-import { calculateDuration, calculateScore, calculateFinalScore, getMeters, formatTime, getKM } from '../../utils/utils'
+import { calculateDuration, formatTime, getKM } from '../../utils/utils'
 
 function Results() {
     const dispatch = useDispatch()

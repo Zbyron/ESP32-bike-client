@@ -62,7 +62,7 @@ function Activity () {
         dispatch(currentScreen('Activity'))
 
         setScore(calculateScore(peds,duration, maxKMPH))
-        const removeEventListener = window.api.receive(channels.COM_EVENT,(result) => {
+        const removeEventListener = window.api.receive(channels.COM_EVENT,() => {
             updateBikeData()
          })
 
