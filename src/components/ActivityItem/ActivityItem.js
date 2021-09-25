@@ -3,8 +3,9 @@ import "bulma/css/bulma.css";
 import './ActivityItem.css'
 import "bulma-helpers/css/bulma-helpers.min.css";
 import { calculateDuration, formatTime, formatDisplayDate, getKM } from '../../utils/utils'
+import PropTypes from 'prop-types';
 
-function ActivityItem({activity, bgInvert}) {
+function ActivityItem({ activity, bgInvert}) {
     const whiteStyle = ' has-background-white '
     const lightStyle = ' has-background-light '
     return (
@@ -29,4 +30,10 @@ function ActivityItem({activity, bgInvert}) {
     );
   }
   
+  ActivityItem.propTypes = {
+    key: PropTypes.number,
+    activity: PropTypes.object,
+    bgInvert: PropTypes.bool
+  };
+
   export default ActivityItem;
