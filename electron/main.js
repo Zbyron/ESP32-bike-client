@@ -67,7 +67,7 @@ function createWindow () {
 
 // SESSIONS
 ipcMain.on(channels.SESSIONS, (event, arg) => {
-    const sql =  'SELECT * FROM SESSION ORDER BY ID DESC;'
+    const sql =  `SELECT * FROM SESSION ORDER BY ID DESC LIMIT ${arg} ;`
 
     database.all(sql, (err, rows) => {
         event.reply(channels.SESSIONS, (err && err.message) || rows);
