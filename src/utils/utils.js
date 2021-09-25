@@ -6,10 +6,17 @@ export const formatTime = ( seconds ) => {
     const timeString = date.toISOString().substr(11, 8);
     return timeString
 }
+
+export const formatDisplayDate = (dateString) => {
+    return new Date(dateString).toLocaleString('en-US', { timeZone: 'America/New_York' })
+}
+
 export const calculateDuration = (startDate, endDate = '' ) => {
     const startDateObj = new Date(startDate)
-    const currentTime = endDate? new Date(endDate) : new Date()
+    const currentTime = endDate ? new Date(endDate) : new Date()
+    console.log('start', startDate? 'yep' : 'nope')
 
+    console.log('date', endDate? 'yep' : 'nope')
     return Math.round((currentTime - startDateObj) /1000)
 }
 
@@ -31,4 +38,9 @@ export const calculateFinalScore = (score, avgSpeed) => {
 }
 export const getMeters = (peds) => {
     return peds * pedMeters
+}
+
+export const getKM = (peds) => {
+    return +parseFloat((peds * pedMeters) / 1000).toFixed(2)
+
 }

@@ -10,7 +10,6 @@ import store from './app/store'
 import { Provider } from 'react-redux'
 import reportWebVitals from './reportWebVitals'
 import { HashRouter, Route } from "react-router-dom"
-import Footer from './containers/Footer/Footer'
 // import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
@@ -24,8 +23,6 @@ ReactDOM.render(
             <Route path="/Activity" exact component={Activity} />
             <Route path="/Results" exact component={Results} />
             <Route path="/Records" exact component={Records} />
-            {/* <Footer /> */}
-
           </div>
         </HashRouter>
       </Provider>

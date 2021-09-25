@@ -5,8 +5,10 @@ import { latest } from '../../features/session/sessionSlice'
 import useInterval from '../../hooks/useInterval'
 import { channels } from '../../constants/storeChannels'
 import { currentScreen } from '../../features/appData/appDataSlice'
-import { calculateDuration, calculateScore, calculateFinalScore, getMeters, formatTime } from '../../utils/utils'
+import { calculateDuration, calculateScore, calculateFinalScore, getMeters, formatTime, getKM } from '../../utils/utils'
 import  { version, pedMeters } from '../../constants/constants'
+import "bulma/css/bulma.css";
+import "bulma-helpers/css/bulma-helpers.min.css";
 
 function Activity () {
     const history = useHistory()
@@ -20,14 +22,13 @@ function Activity () {
     const [duration, setDuration] = useState(0)
     const [score, setScore] = useState(0)
 
-
     const updateBikeData = useCallback( () => {
         setPeds(peds + 1)
         setPedInterval(pedInverval + 1)
       })
     
     const endSession = useCallback(() => {
-        const avgSpeed = ((getMeters(peds)) / duration) 
+        const avgSpeed =  +parseFloat(((getMeters(peds)) / duration) ).toFixed(2)
         const finalScore = (calculateFinalScore(score, avgSpeed))
         const sessionData = {
             startDate,
@@ -42,7 +43,6 @@ function Activity () {
         dispatch(latest(sessionData))
         window.api.send(channels.ADD_SESSION,sessionData)
         history.push("/Results");
-    
     })
 
     useInterval(() => {
@@ -72,16 +72,39 @@ function Activity () {
       });
   
     return (
-        <div>
-            <h1>ESP32 Bike</h1>
-            <h2>ESP32 Activity started</h2>
-            <h3> Peds {peds}</h3>
-            <h3> Interval {intervalCount}</h3>
-            <h3> KMPH {KMPH}</h3>
-            <h3> Score {score}</h3>
-            <h3> Duration {formatTime(duration)}</h3>
-
-            <button onClick={endSession}>End Session</button>
+        <div className="">
+            <div className="tile is-ancestor">
+                <div className="tile is-4 is-vertical is-parent">
+                    <div className="tile is-child box">
+                        <p className="title">Time</p>
+                        <p className="is-size-5" > {formatTime(duration)} </p>
+                        <hr />
+                        <p className="title">Score</p>
+                        <p  className="is-size-5">{score}</p>
+                        <hr />
+                        <button className="button is-rounded is-medium is-danger" onClick={endSession}>End Session</button>
+                    </div>
+                </div>
+                <div className="tile is-parent">
+                    <div className="tile is-child box">
+                        <p className="title">Stats</p>
+                        <div className="level">
+                            <p className="is-size-4"> KM:</p>
+                            <p className="is-size-2	"> {getKM(peds)}</p>
+                        </div>
+                        <hr />
+                        <div className="level">
+                            <p className="is-size-3"> Speed:</p>
+                            <p className="is-size-3	"> {KMPH}</p>
+                        </div>
+                        <hr />
+                        <div className="level">
+                            <p className="is-size-4"> Top Speed:</p>
+                            <p className="is-size-3	"> {maxKMPH}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
   }

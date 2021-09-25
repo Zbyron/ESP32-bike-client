@@ -5,6 +5,7 @@ import { currentScreen } from '../../features/appData/appDataSlice'
 import { useDispatch } from 'react-redux'
 import ActivityList from '../ActivityList/ActivityList'
 import "bulma/css/bulma.css";
+import "bulma-helpers/css/bulma-helpers.min.css";
 
 function Records() {
     const dispatch = useDispatch()
@@ -25,12 +26,12 @@ function Records() {
    },[])
 
     return (
-        <div>
+        <div className="section">
             <div className="container ">
-                <h2 className="subtitle"> Last 50 Sessions </h2>
+                <h2 className="subtitle "> Last 50 Sessions </h2>
                 <ActivityList  activities={ dbSession }/>
-                <div className="has-padding-top-50 "> 
-                <Link  className="button " to="/Intro">Home</Link>
+                <div className="has-padding-top-20 "> 
+                    <Link  className="button is-info is-small" to="/Intro">Home</Link>
                 </div>
             </div>
         </div>
