@@ -75,7 +75,7 @@ ipcMain.on(channels.SESSIONS, (event, arg) => {
 });
 
 //LAST_RESULT
-ipcMain.on(channels.LAST_SESSION, (event, arg) => {
+ipcMain.on(channels.LAST_SESSION, (event) => {
         event.reply(channels.LAST_SESSION, store.get(channels.LAST_SESSION));
 });
 
@@ -100,5 +100,7 @@ const usbport = new SerialPort("COM7", {
 const parser = usbport.pipe(new Readline()); 
 parser.on('data', function (data) {
     console.log('data ',data)
-    mainWindow.webContents.send(channels.COM_EVENT, data);
+    if(data === "ESP32_BIKE_PED"){
+      mainWindow.webContents.send(channels.COM_EVENT, data);
+    }
 });
