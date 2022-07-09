@@ -97,7 +97,7 @@ const Readline = SerialPort.parsers.Readline;
 const usbport = new SerialPort("COM7", {
     baudRate: 9600
 })
-const parser = usbport.pipe(new Readline()); 
+const parser = usbport.pipe(new Readline({ delimiter: '\r\n' })); 
 parser.on('data', function (data) {
     console.log('data ',data)
     if(data === "ESP32_BIKE_PED"){
